@@ -16,6 +16,7 @@ import (
 	"encoding/asn1"
 	"errors"
 	"fmt"
+	"hash"
 )
 
 type envelopedData struct {
@@ -75,7 +76,7 @@ var KeyEncryptionAlgorithm = OIDEncryptionAlgorithmRSA
 // OAEPHashFunction determines which hash function is used during rsa.EncryptOAEP
 // and rsa.DecryptOAEP when not otherwise specified.
 // TODO: Default to other?
-var OAEPHashFunction = sha256.New()
+var OAEPHashFunction func() hash.Hash = sha256.New
 
 // ErrUnsupportedEncryptionAlgorithm is returned when attempting to encrypt
 // content with an unsupported algorithm.
@@ -398,7 +399,7 @@ func encryptKey(key []byte, recipient *x509.Certificate) ([]byte, error) {
 	if pub := recipient.PublicKey.(*rsa.PublicKey); pub != nil {
 		switch {
 		case KeyEncryptionAlgorithm.Equal(OIDEncryptionAlgorithmidRSAESOAEP):
-			return rsa.EncryptOAEP(OAEPHashFunction, rand.Reader, pub, key, nil)
+			return rsa.EncryptOAEP(OAEPHashFunction(), rand.Reader, pub, key, nil)
 
 		case KeyEncryptionAlgorithm.Equal(OIDEncryptionAlgorithmRSA):
 			return rsa.EncryptPKCS1v15(rand.Reader, pub, key)

@@ -30,7 +30,7 @@ func getDecryptedKey(algorithm asn1.ObjectIdentifier, key crypto.PrivateKey, enc
 		switch {
 		case algorithm.Equal(OIDEncryptionAlgorithmidRSAESOAEP):
 			//TODO: Default to one?
-			return rsa.DecryptOAEP(OAEPHashFunction, rand.Reader, pkey, encryptedKey, nil)
+			return rsa.DecryptOAEP(OAEPHashFunction(), rand.Reader, pkey, encryptedKey, nil)
 
 		case algorithm.Equal(OIDEncryptionAlgorithmRSA):
 			return rsa.DecryptPKCS1v15(rand.Reader, pkey, encryptedKey)
